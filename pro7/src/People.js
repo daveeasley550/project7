@@ -7,12 +7,17 @@ class People extends Component {
     this.state = {
       people: [],
       personToEdit: {},
-        showPeople: ""
+        showPeople: "",
+        newPerson:{},
+        currentSelected:{}
     };
   }
   componentDidMount() {
     this.pullPeople();
   }
+//   getCurrentSelected=(selectedPersonData)=>{
+//     this.setState({currentSelected:selectedPersonData})
+//   }
   pullPeople = (people) => {
     const peopleUrl = "https://polar-lake-62924.herokuapp.com/peoples/";
     fetch(peopleUrl)
@@ -36,9 +41,7 @@ class People extends Component {
         onClick={() => this.handleMore(person._id)}>{" "}{person.name}</a>
       {this.state.showPeople==person._id?
       <div>
-          <button className="button" onClick={() => {
-              this.getPersonToDelete(this.state.personToEdit.id);
-            }}>Delete</button>
+          <button className="button" onClick={() => {this.deletePerson(person._id)}}>Delete</button>
             <button className="button" onClick={() => {
               this.getPersonToEdit(person);
             }}>Edit</button>
@@ -55,19 +58,71 @@ class People extends Component {
     ));
     return peopleCards; 
   };
-  getPersonToEdit = (thePerson) => {
-    console.log("edit",)
-    this.setState({ personToEdit: thePerson });
-  };
-  getPersonToDelete = (id) => {
-    const allPeople = [...this.state.people];
-    const peopleAfterDelete = allPeople.filter((person) => person.id !== id);
-    console.log(peopleAfterDelete)
-    
-    //add the db delete
-    this.setState({ people: peopleAfterDelete, personToEdit: {} });
-    console.log("deleting")
-  };
+  createNewPerson = (e) => {
+    e.preventDefault()
+    const newPerson = this.state.newPerson
+    const requestOptions = {
+      method: "POST",
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newPerson)
+    }
+    fetch("https://polar-lake-62924.herokuapp.com/peoples/", requestOptions)
+    .then(resp=>resp.json())
+    .then(returnedPerson=>{
+      console.log(returnedPerson)
+      this.setState({people: [...this.state.people, returnedPerson]})
+    })
+  }
+  handleFormChange =(e)=>{
+    // console.log(e.target.name, e.target.value)
+    this.setState({newPerson:{...this.state.newPerson, [e.target.name]:e.target.value}})
+  }
+  deletePerson=(id)=>{
+    console.log("delete me:",id)
+    fetch("https://polar-lake-62924.herokuapp.com/peoples/"+id,{method: "DELETE"})
+    .then(resp=>resp.json())
+    .then(deleteResp=>{
+    const updatedPeople = this.state.people.filter(person=>person._id!=id)
+    this.setState({currentSelected:{}, bookmarks: updatedPeople})
+    })
+      }
+      //   getPersonToDelete = (id) => {
+        //     const allPeople = [...this.state.people];
+        //     const peopleAfterDelete = allPeople.filter((person) => person.id !== id);
+        //     console.log(peopleAfterDelete)
+            
+           
+        //     this.setState({ people: peopleAfterDelete, personToEdit: {} });
+        //     console.log("deleting")
+        //   };
+      updatePerson = (e) =>{
+        e.preventDefault()
+        const{name,birth_year,eye_color,gender,hair_color,height,mass,skin_color,_id} =this.state.personToEdit
+        const updatedPerson = {name,birth_year,eye_color,gender,hair_color,height,mass,skin_color}
+        console.log(updatedPerson,_id)
+        const requestOptions = {
+          method: "PUT",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updatedPerson)
+        }
+        fetch("https://polar-lake-62924.herokuapp.com/peoples/"+_id, requestOptions)
+          .then(resp => resp.json())
+          .then(returnedUpdatedPerson => {
+            console.log(returnedUpdatedPerson)
+            const allUpdatedPeople = this.state.people.map(person=>person._id ===_id ? returnedUpdatedPerson : person)
+            this.setState({people: allUpdatedPeople, currentSelected:{}, personToEdit:{}})
+          })
+      }
+//   getPersonToEdit = (thePerson) => {
+//     console.log("edit",)
+//     this.setState({ personToEdit: thePerson });
+//   };
+
 
   render() {
     //   console.log(this.state.personToEdit)
@@ -76,15 +131,20 @@ class People extends Component {
     return (
       <div>
         <h1>StarWars People</h1>
+        
+        <h2>Create Your Own Character</h2>
+        <form onSubmit={this.createNewPerson}>
+          <input type="text" name="name" placeholder="Enter name" value={this.state.newPerson.name} onChange={this.handleFormChange} />
+          <input type="text" name="birth_year" placeholder="Enter Birth Year" value={this.state.newPerson.birth_year} onChange={this.handleFormChange} />
+          <input type="text" name="gender" placeholder="Enter Gender" value={this.state.newPerson.gender} onChange={this.handleFormChange} />
+          <input type="text" name="height" placeholder="Enter Height" value={this.state.newPerson.height} onChange={this.handleFormChange} />
+          <input type="text" name="mass" placeholder="Enter Weight" value={this.state.newPerson.mass} onChange={this.handleFormChange} />
+          <input type="text" name="hair_color" placeholder="Enter Hair Color" value={this.state.newPerson.hair_color} onChange={this.handleFormChange} />
+          <input type="text" name="eye_color" placeholder="Enter Eye Color" value={this.state.newPerson.eye_color} onChange={this.handleFormChange} />
+          <input type="text" name="skin_color" placeholder="Enter Skin Color" value={this.state.newPerson.skin_color} onChange={this.handleFormChange} />
+          <button type="submit">Create Character</button>
+        </form>
         {peopleCards}
-        {/* <h2>Edit</h2>
-        <div id="personToEdit">
-          <h1>{this.state.personToEdit.name}</h1>
-          <button className="button" onClick={() => {
-              this.getPersonToDelete(this.state.personToEdit._id);
-            }}>Delete</button> */}
-        {/* </div> */}
-       
       </div>
     );
     {
