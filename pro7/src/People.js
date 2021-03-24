@@ -6,18 +6,19 @@ class People extends Component {
     super();
     this.state = {
       people: [],
+      currentSelected:{},
       personToEdit: {},
-        showPeople: "",
-        newPerson:{},
-        currentSelected:{}
+      showPeople: "",
+      newPerson:{}
+        
     };
   }
   componentDidMount() {
     this.pullPeople();
   }
-//   getCurrentSelected=(selectedPersonData)=>{
-//     this.setState({currentSelected:selectedPersonData})
-//   }
+  getCurrentSelected=(selectedPersonData)=>{
+    this.setState({currentSelected:selectedPersonData})
+  }
   pullPeople = (people) => {
     const peopleUrl = "https://polar-lake-62924.herokuapp.com/peoples/";
     fetch(peopleUrl)
@@ -34,17 +35,23 @@ class People extends Component {
       showPeople: _id,
     });
   };
+  handleEditChange=(e)=>{
+    this.setState({personToEdit:{...this.state.personToEdit,[e.target.name]:e.target.value }})
+      }
   displayAllPeople = (people) => {
     const peopleCards = people.map((person) => (
      <div>
         <a className="person-card" href="#handleMore"
-        onClick={() => this.handleMore(person._id)}>{" "}{person.name}</a>
+        onClick={() => {this.handleMore(person._id);this.getCurrentSelected(person.name)}}>{person.name}
+
+{/* <a href="#" onClick={() => { func1(); func2();}}>Test Link</a> */}
+        
+        </a>
       {this.state.showPeople==person._id?
       <div>
           <button className="button" onClick={() => {this.deletePerson(person._id)}}>Delete</button>
-            <button className="button" onClick={() => {
-              this.getPersonToEdit(person);
-            }}>Edit</button>
+          <button className="button" onClick={() => {this.getEditPerson(person)}}>Edit</button>
+           
            <h5>Birth Year: {person.birth_year}</h5>
            <h5>Gender: {person.gender}</h5>    
            <h5>Height: {person.height}cm</h5>
@@ -118,6 +125,9 @@ class People extends Component {
             this.setState({people: allUpdatedPeople, currentSelected:{}, personToEdit:{}})
           })
       }
+      getEditPerson = (personToEdit) => {
+        this.setState({personToEdit})
+      }
 //   getPersonToEdit = (thePerson) => {
 //     console.log("edit",)
 //     this.setState({ personToEdit: thePerson });
@@ -145,6 +155,20 @@ class People extends Component {
           <button type="submit">Create Character</button>
         </form>
         {peopleCards}
+        {/* {this.state.people.map(person => <div onClick={() => this.getCurrentSelected(person)} key={person._id}>{person.name}</div>)} */}
+        <h2>Update Character</h2>
+        {this.state.personToEdit._id && 
+        <form onSubmit={this.updatePerson}>
+          <input type="text" name="name" placeholder="Enter name" value={this.state.personToEdit.name} onChange={this.handleEditChange} />
+          <input type="text" name="birth_year" placeholder="Enter Birth Year" value={this.state.personToEdit.birth_year} onChange={this.handleEditChange} />
+          <input type="text" name="gender" placeholder="Enter Gender" value={this.state.personToEdit.gender} onChange={this.handleEditChange} />
+          <input type="text" name="height" placeholder="Enter Height" value={this.state.personToEdit.height} onChange={this.handleEditChange} />
+          <input type="text" name="mass" placeholder="Enter Weight" value={this.state.personToEdit.mass} onChange={this.handleEditChange} />
+          <input type="text" name="hair_color" placeholder="Enter Hair Color" value={this.state.personToEdit.hair_color} onChange={this.handleEditChange} />
+          <input type="text" name="eye_color" placeholder="Enter Eye Color" value={this.state.personToEdit.eye_color} onChange={this.handleEditChange} />
+          <input type="text" name="skin_color" placeholder="Enter Skin Color" value={this.state.personToEdit.skin_color} onChange={this.handleEditChange} />
+          <button type="submit">Edit Character</button>
+        </form>}
       </div>
     );
     {
