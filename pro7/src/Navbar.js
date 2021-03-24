@@ -8,7 +8,6 @@ export default class Nav extends React.Component {
       <header>
         <a href={"/"}>Home</a>
         <a href={"/people"}>People</a>
-        <a href={"/find"}>Find</a>
       </header>
     );
   }

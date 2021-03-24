@@ -23,8 +23,19 @@ export default class Home extends React.Component {
     render() {
         return (
             <div>
-               //put documentation and a background picture here
+            <div className="home-words">
+               <h1>A LONG TIME AGO IN A GALAXY FAR AWAY...</h1>
+               <h2>THERE WAS A DUDE...HE WAS A NERD</h2>
+               <h3>AND HE LIKED CODING</h3>
+               <h4>SO HE MADE AN API</h4>
+               <h5>THIS API!!!!</h5>
+               <h6>CLICK PEOPLE IN THE NAV</h6>
             </div>
+            <div className="star">
+            <h1>STARWARS!!!!</h1>
+            </div>
+            </div>
+
         )
     }
 }

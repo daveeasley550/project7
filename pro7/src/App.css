@@ -13,7 +13,18 @@
   border: 1px solid black;
   margin: .5em;
 }
+.home-words{
+  color: gold;
+  background-color: black;
+}
+.star{
+  height: 300px;
+  color: gold;
+  background: url(https://media.giphy.com/media/2w5MMNvg70MrQ0I2DR/giphy.gif)   center no-repeat;
+  padding-bottom: 30px;
+  background-color: black;
 
+}
 
 
 
